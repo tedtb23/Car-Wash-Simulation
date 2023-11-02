@@ -1,2 +1,2 @@
 # Car-Wash-Simulation
-Simple car wash simulation written in Java that uses a priority queue to determine which car to wash next based on their price and arrival time.
+Simple car wash simulation of a car wash with a flexible pricing structure that determines which car to wash next based on a car's chosen price.
