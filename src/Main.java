@@ -15,6 +15,7 @@ public class Main {
 			System.out.println("Input path/name of file containing cars in the format of 'ArrivalTime(int) Price(float)'");
 			String fileName = scnr.next();
 			FileReader fileRead = new FileReader(fileName);
+			scnr.close();
 			scnr = new Scanner(fileRead);
 			carWash = new CarWash(scnr);
 			scnr.close();
