@@ -8,7 +8,6 @@ import java.util.Scanner;
  * @version 11/7/23
  */
 public class CarWash {
-	private SimStats stats;
 	private static final int WASH_TIME = 3;
 	
 	/**
@@ -17,13 +16,15 @@ public class CarWash {
 	 * @param scnr Scanner containing a list of cars with their arrivalTime and price.
 	 */
 	public void simulate(Scanner scnr) {
-		stats = new SimStats();
+		SimStats stats = new SimStats();
 		LinkedList<Customer> cars = readCars(scnr);
+		stats.setNumWashes(cars.size());
 		LinkedListIterator<Customer> itr = cars.first();
 		PriorityQueue<Customer> pQueue = new PriorityQueue<Customer>();
 		advanceToEnd(itr, pQueue, null, 0);
 		itr = cars.first();
-		printStats(itr);
+		calcStats(itr, stats);
+		printStats(stats);
 	}
 	
 	
@@ -64,7 +65,7 @@ public class CarWash {
 	 * Calculates the statistics for the customers
 	 * of the car wash once the simulation is complete.
 	 */
-	private void calcStats(LinkedListIterator<Customer> itr) {		
+	private void calcStats(LinkedListIterator<Customer> itr, SimStats stats) {
 		while(itr.isValid()) {
 			if(itr.retrieve().getWaitTime() <= stats.getMinWait().getWaitTime()) {
 				stats.setMinWait(itr.retrieve());
@@ -84,8 +85,7 @@ public class CarWash {
 	 * Prints the statistics for the customers
 	 * of the car wash once the simulation is complete.
 	 */
-	private void printStats(LinkedListIterator<Customer> itr) {
-		calcStats(itr);
+	private void printStats(SimStats stats) {
 		for(int i = 0; i < 50; i++) {
 			System.out.print("=");
 		}
@@ -156,6 +156,5 @@ public class CarWash {
 		currWash.setEndTime(clock + WASH_TIME);
 		currWash.setWaitTime(currWash.getStartTime() - currWash.getArrivalTime());
 		System.out.printf("%d: Car %d starts wash [Wait %d]\n", clock, currWash.getID(), currWash.getWaitTime());
-		stats.setNumWashes(stats.getNumWashes() + 1);
 	}
 }
