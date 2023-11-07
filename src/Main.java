@@ -9,18 +9,29 @@ import java.util.Scanner;
  */
 public class Main {
 	public static void main(String[] args) {
-		CarWash carWash;
+		CarWash carWash = new CarWash();
 		try {
-			Scanner scnr = new Scanner(System.in);
+			Scanner cScnr = new Scanner(System.in);
+			Scanner fScnr;
 			System.out.println("Input path/name of file containing cars in the format of 'ArrivalTime(int) Price(float)'");
-			String fileName = scnr.next();
-			FileReader fileRead = new FileReader(fileName);
-			scnr.close();
-			scnr = new Scanner(fileRead);
-			carWash = new CarWash(scnr);
-			scnr.close();
+			System.out.println("Or input 'q' to quit");
+			String cmnd = cScnr.next();
+			
+			while(!cmnd.equals("q")) {
+				String fileName = cmnd;
+				FileReader fileRead = new FileReader(fileName);
+				fScnr = new Scanner(fileRead);
+				carWash.simulate(fScnr);
+				fScnr.close();
+				System.out.println("\n\nInput path/name of file containing cars in the format of 'ArrivalTime(int) Price(float)'");
+				System.out.println("Or input 'q' to quit");
+				cmnd = cScnr.next();
+			}
+			cScnr.close();
+			
 		}catch(FileNotFoundException e) {
 			System.err.print(e);
+			
 		}
 	}
 }

@@ -2,56 +2,49 @@ import java.util.Scanner;
 
 /**
  * Simulates a car wash with a priority
- * queue and prints the statistics of 
- * the customers/cars at the end.
+ * queue.
  * 
  * @author Ted Barnaby
- * @version 4/1/23
+ * @version 11/7/23
  */
 public class CarWash {
-	private PriorityQueue<Customer> pQueue;
-	private LinkedList<Customer> cars;
-	private LinkedListIterator<Customer> itr;
 	private SimStats stats;
 	private static final int WASH_TIME = 3;
 	
 	/**
-	 * Runs the car wash simulation.
+	 * Simulates the car wash with the given arrival times and prices given in scnr.
 	 * 
-	 * @param fileScnr Scanner for the file containing a list of cars with their arrivalTime and price.
+	 * @param scnr Scanner containing a list of cars with their arrivalTime and price.
 	 */
-	CarWash(Scanner fileScnr) {
-		pQueue = new PriorityQueue<Customer>();
-		cars = new LinkedList<Customer>();
+	public void simulate(Scanner scnr) {
 		stats = new SimStats();
-		
-		itr = cars.zeroth();
-		readCars(fileScnr);
+		LinkedList<Customer> cars = readCars(scnr);
+		LinkedListIterator<Customer> itr = cars.first();
+		PriorityQueue<Customer> pQueue = new PriorityQueue<Customer>();
+		advanceToEnd(itr, pQueue, null, 0);
 		itr = cars.first();
-		advanceToEnd(null, 0);
-		itr = cars.first();
-		printStats();
+		printStats(itr);
 	}
 	
-	/**
+	
+	/*
 	 * Reads cars from fileScnr into the simulation.
-	 * 
-	 * @param fileScnr Scanner for the file containing a list of cars with their arrivalTime and price.
 	 */
-	private void readCars(Scanner fileScnr) {
+	private LinkedList<Customer> readCars(Scanner scnr) {
+		LinkedList<Customer> cars = new LinkedList<Customer>();
+		LinkedListIterator<Customer> itr = cars.zeroth();
 		int currID = 0;
-		while(fileScnr.hasNext()) {
-			cars.insert(new Customer(++currID, fileScnr.nextInt(), fileScnr.nextDouble()), itr);
+		while(scnr.hasNext()) {
+			cars.insert(new Customer(++currID, scnr.nextInt(), scnr.nextDouble()), itr);
 			itr.advance();
 		}
+		return cars;
 	}
 	
-	/**
+	/*
 	 * Prints the cars currently waiting in the priority queue to be washed.
-	 * 
-	 * @param clock Simulation clock.
 	 */
-	private void printWait(int clock) {
+	private void printWait(PriorityQueue<Customer> pQueue, int clock) {
 		int pSize = pQueue.size();
 		Customer[] tempData = new Customer[pSize];
 		
@@ -67,11 +60,11 @@ public class CarWash {
 	}
 	
 	
-	/**
+	/*
 	 * Calculates the statistics for the customers
 	 * of the car wash once the simulation is complete.
 	 */
-	private void calcStats() {		
+	private void calcStats(LinkedListIterator<Customer> itr) {		
 		while(itr.isValid()) {
 			if(itr.retrieve().getWaitTime() <= stats.getMinWait().getWaitTime()) {
 				stats.setMinWait(itr.retrieve());
@@ -87,12 +80,12 @@ public class CarWash {
 		stats.setAvgPrice(stats.getTotalSales()/stats.getNumWashes());
 	}
 	
-	/**
+	/*
 	 * Prints the statistics for the customers
 	 * of the car wash once the simulation is complete.
 	 */
-	private void printStats() {
-		calcStats();
+	private void printStats(LinkedListIterator<Customer> itr) {
+		calcStats(itr);
 		for(int i = 0; i < 50; i++) {
 			System.out.print("=");
 		}
@@ -103,23 +96,24 @@ public class CarWash {
 				+ "\nMax wait is car ID #%d [$%.2f] at %d cycles"
 				+ "\nAverage wait is %.1f"
 				+ "\nTotal sales are $%.2f"
-				+ "\nAverage price is $%.2f", stats.getNumWashes()
+				+ "\nAverage price is $%.2f\n", stats.getNumWashes()
 				, stats.getMinWait().getID(), stats.getMinWait().getPrice()
 				, stats.getMinWait().getWaitTime(), stats.getMaxWait().getID()
 				, stats.getMaxWait().getPrice(), stats.getMaxWait().getWaitTime()
 				, stats.getAvgWait(), stats.getTotalSales(), stats.getAvgPrice());
+		
+		for(int i = 0; i < 50; i++) {
+			System.out.print("=");
+		}
 	}
 	
 	
 	
-	/**
+	/*
 	 * Advances the simulation step by step to its end
 	 * (once all the cars in the given list have been washed).
-	 *
-	 *@param currWash The current car in the car wash.
-	 *@param clock Simulation clock.
 	 */
-	private void advanceToEnd(Customer currWash, int clock) {
+	private void advanceToEnd(LinkedListIterator<Customer> itr, PriorityQueue<Customer> pQueue, Customer currWash, int clock) {
 		Customer currCar = itr.retrieve();
 		
 		//Enqueue the next car from itr once its arrivalTime has been reached.
@@ -131,38 +125,37 @@ public class CarWash {
 				currCar = itr.retrieve();
 				if(currCar == null) break;
 			}
-		printWait(clock);
+		printWait(pQueue, clock);
 		
 		//Only do this on first execution to get car washed started.
-		if(currWash == null) currWash = newWash(clock);
+		if(currWash == null && !pQueue.isEmpty()) {
+			currWash = pQueue.dequeue();
+			newWash(currWash, clock);
+		}
 		
 		
 		//Only enqueue the next car once the currWash car has finished.
 		if(clock == currWash.getEndTime()) {
 			System.out.printf("%d: Car %d exits wash\n", clock, currWash.getID());
 			
-			if(!pQueue.isEmpty())
-				currWash = newWash(clock);
-			else return; //base case
+			if(!pQueue.isEmpty()) {
+				currWash = pQueue.dequeue();
+				newWash(currWash, clock);
+			} else return; //base case
 		}			
 		clock++;
-		advanceToEnd(currWash, clock); //recursive call
+		advanceToEnd(itr, pQueue, currWash, clock); //recursive call
 	}
 	
 	
-	/**
-	 * Dequeue a new car to enter the car wash.
-	 * 
-	 * @param clock Simulation clock.
-	 * @return New car to enter the car wash.
+	/*
+	 * Set a car's times based on the given clock.
 	 */
-	private Customer newWash(int clock) {
-		Customer currWash = pQueue.dequeue();
+	private void newWash(Customer currWash, int clock) {
 		currWash.setStartTime(clock);
 		currWash.setEndTime(clock + WASH_TIME);
 		currWash.setWaitTime(currWash.getStartTime() - currWash.getArrivalTime());
 		System.out.printf("%d: Car %d starts wash [Wait %d]\n", clock, currWash.getID(), currWash.getWaitTime());
 		stats.setNumWashes(stats.getNumWashes() + 1);
-		return currWash;
 	}
 }
