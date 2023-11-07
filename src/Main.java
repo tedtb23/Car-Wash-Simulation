@@ -5,7 +5,7 @@ import java.util.Scanner;
 /**
  * Main driver for CarWash simulation.
  * @author Ted Barnaby
- * @version 4/1/23
+ * @version 11/7/23
  */
 public class Main {
 	public static void main(String[] args) {
