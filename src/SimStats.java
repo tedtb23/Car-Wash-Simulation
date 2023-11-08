@@ -1,3 +1,9 @@
+/**
+ * Implements several statistics for the car wash simulation.
+ * 
+ * @author Ted Barnaby
+ * @version 11/8/23
+ */
 public class SimStats {
 	private int numWashes;
 	private Customer maxWait;

@@ -5,7 +5,7 @@ import java.util.Scanner;
  * queue.
  * 
  * @author Ted Barnaby
- * @version 11/7/23
+ * @version 11/8/23
  */
 public class CarWash {
 	/**
