@@ -13,13 +13,12 @@ public class Main {
 		try {
 			Scanner cScnr = new Scanner(System.in);
 			Scanner fScnr;
-			System.out.println("Input path/name of file containing cars in the format of 'ArrivalTime(int) Price(float)'");
+			System.out.println("Input \"path\\name\" of file containing cars in the format of \"ArrivalTime(int) Price(float)\"");
 			System.out.println("Or input 'q' to quit");
 			String cmnd = cScnr.next();
 			
 			while(!cmnd.equals("q")) {
-				String fileName = cmnd;
-				FileReader fileRead = new FileReader(fileName);
+				FileReader fileRead = new FileReader(cmnd);
 				fScnr = new Scanner(fileRead);
 				carWash.simulate(fScnr);
 				fScnr.close();
@@ -30,8 +29,8 @@ public class Main {
 			cScnr.close();
 			
 		}catch(FileNotFoundException e) {
-			System.err.print(e);
-			
+			System.err.print(e + "\n");
+			main(args);
 		}
 	}
 }
