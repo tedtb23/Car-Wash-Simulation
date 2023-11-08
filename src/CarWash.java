@@ -127,6 +127,9 @@ public class CarWash {
 		advanceToEnd(itr, pQueue, currWash, clock);
 	}
 	
+	/*
+	 * Enqueue the next cars appropriate for the given clock cycle.
+	 */
 	private void enqueueCars(LinkedListIterator<Customer> itr, PriorityQueue<Customer> pQueue, int clock) {
 		Customer currCar = itr.retrieve();
 		
@@ -141,6 +144,9 @@ public class CarWash {
 			}
 	}
 	
+	/*
+	 * Dequeue the current washed car if it exists and its end time has been reached.
+	 */
 	private Customer dequeueCar(PriorityQueue<Customer> pQueue, Customer currWash, int clock) {
 		if(!pQueue.isEmpty()) {
 			if(currWash == null) {
