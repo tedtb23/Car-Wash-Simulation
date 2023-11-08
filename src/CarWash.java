@@ -8,8 +8,6 @@ import java.util.Scanner;
  * @version 11/7/23
  */
 public class CarWash {
-	private static final int WASH_TIME = 3;
-	
 	/**
 	 * Simulates the car wash with the given arrival times and prices given in scnr.
 	 * 
@@ -116,9 +114,9 @@ public class CarWash {
 	private void advanceToEnd(LinkedListIterator<Customer> itr, PriorityQueue<Customer> pQueue, Customer currWash, int clock) {
 		Customer currCar = itr.retrieve();
 		
-		//Enqueue the next car from itr once its arrivalTime has been reached.
 		if(currCar != null)
-			while(clock == currCar.getArrivalTime()) {
+			while(clock >= currCar.getArrivalTime()) {
+				if(clock != currCar.getArrivalTime()) currCar.setArrivalTime(clock); //change currCar's arrivalTime if arrivalTimes in the file are malformed.
 				pQueue.enqueue(currCar);
 				System.out.printf("%d: Car %d ($%.2f) enters system\n", clock, currCar.getID(), currCar.getPrice());
 				itr.advance();
@@ -127,24 +125,38 @@ public class CarWash {
 			}
 		printWait(pQueue, clock);
 		
-		//Only do this on first execution to get car washed started.
-		if(currWash == null && !pQueue.isEmpty()) {
-			currWash = pQueue.dequeue();
-			newWash(currWash, clock);
-		}
-		
-		
-		//Only enqueue the next car once the currWash car has finished.
-		if(clock == currWash.getEndTime()) {
-			System.out.printf("%d: Car %d exits wash\n", clock, currWash.getID());
-			
-			if(!pQueue.isEmpty()) {
+		if(!pQueue.isEmpty()) {
+			if(currWash == null) {
 				currWash = pQueue.dequeue();
 				newWash(currWash, clock);
-			} else return; //base case
-		}			
+			}else if(clock == currWash.getEndTime()) {
+				System.out.printf("%d: Car %d exits wash\n", clock, currWash.getID());
+				currWash = pQueue.dequeue();
+				newWash(currWash, clock);
+			}	
+		}else if(currWash != null && clock == currWash.getEndTime()) {
+			System.out.printf("%d: Car %d exits wash\n", clock, currWash.getID());
+			return;
+		}
+		
+		/*
+		if(currWash != null) {
+			if(clock == currWash.getEndTime()) {
+				System.out.printf("%d: Car %d exits wash\n", clock, currWash.getID());
+				if(!pQueue.isEmpty()) {
+					currWash = pQueue.dequeue();
+					newWash(currWash, clock);
+				}
+			}
+		}else if(!pQueue.isEmpty()){
+			currWash = pQueue.dequeue();
+			newWash(currWash, clock);
+		}else return;// base case
+		*/
+		
 		clock++;
-		advanceToEnd(itr, pQueue, currWash, clock); //recursive call
+		
+		advanceToEnd(itr, pQueue, currWash, clock);
 	}
 	
 	
@@ -152,6 +164,7 @@ public class CarWash {
 	 * Set a car's times based on the given clock.
 	 */
 	private void newWash(Customer currWash, int clock) {
+		final int WASH_TIME = 3;
 		currWash.setStartTime(clock);
 		currWash.setEndTime(clock + WASH_TIME);
 		currWash.setWaitTime(currWash.getStartTime() - currWash.getArrivalTime());
