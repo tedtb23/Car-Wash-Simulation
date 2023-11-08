@@ -16,9 +16,16 @@ public class CarWash {
 	public void simulate(Scanner scnr) {
 		SimStats stats = new SimStats();
 		LinkedList<Customer> cars = readCars(scnr);
+		
+		if(cars.size() == 0) {
+			System.out.println("Empty List");
+			return;
+		}
 		stats.setNumWashes(cars.size());
+		
 		LinkedListIterator<Customer> itr = cars.first();
 		PriorityQueue<Customer> pQueue = new PriorityQueue<Customer>();
+		
 		advanceToEnd(itr, pQueue, null, 0);
 		itr = cars.first();
 		calcStats(itr, stats);
@@ -112,19 +119,29 @@ public class CarWash {
 	 * (once all the cars in the given list have been washed).
 	 */
 	private void advanceToEnd(LinkedListIterator<Customer> itr, PriorityQueue<Customer> pQueue, Customer currWash, int clock) {
+		enqueueCars(itr, pQueue, clock);
+		printWait(pQueue, clock);
+		currWash = dequeueCar(pQueue, currWash, clock);
+		if(itr.retrieve() == null && currWash == null) return; //base case
+		clock++;
+		advanceToEnd(itr, pQueue, currWash, clock);
+	}
+	
+	private void enqueueCars(LinkedListIterator<Customer> itr, PriorityQueue<Customer> pQueue, int clock) {
 		Customer currCar = itr.retrieve();
 		
 		if(currCar != null)
 			while(clock >= currCar.getArrivalTime()) {
-				if(clock != currCar.getArrivalTime()) currCar.setArrivalTime(clock); //change currCar's arrivalTime if arrivalTimes in the file are malformed.
+				if(clock != currCar.getArrivalTime()) currCar.setArrivalTime(clock); //change currCar's arrivalTime if arrivalTimes in the file are out of order.
 				pQueue.enqueue(currCar);
 				System.out.printf("%d: Car %d ($%.2f) enters system\n", clock, currCar.getID(), currCar.getPrice());
 				itr.advance();
 				currCar = itr.retrieve();
 				if(currCar == null) break;
 			}
-		printWait(pQueue, clock);
-		
+	}
+	
+	private Customer dequeueCar(PriorityQueue<Customer> pQueue, Customer currWash, int clock) {
 		if(!pQueue.isEmpty()) {
 			if(currWash == null) {
 				currWash = pQueue.dequeue();
@@ -133,32 +150,15 @@ public class CarWash {
 				System.out.printf("%d: Car %d exits wash\n", clock, currWash.getID());
 				currWash = pQueue.dequeue();
 				newWash(currWash, clock);
-			}	
-		}else if(currWash != null && clock == currWash.getEndTime()) {
-			System.out.printf("%d: Car %d exits wash\n", clock, currWash.getID());
-			return;
-		}
-		
-		/*
-		if(currWash != null) {
+			}
+			return currWash;
+		}else if(currWash != null) {
 			if(clock == currWash.getEndTime()) {
 				System.out.printf("%d: Car %d exits wash\n", clock, currWash.getID());
-				if(!pQueue.isEmpty()) {
-					currWash = pQueue.dequeue();
-					newWash(currWash, clock);
-				}
-			}
-		}else if(!pQueue.isEmpty()){
-			currWash = pQueue.dequeue();
-			newWash(currWash, clock);
-		}else return;// base case
-		*/
-		
-		clock++;
-		
-		advanceToEnd(itr, pQueue, currWash, clock);
+			}else return currWash;
+		}	
+		return null;
 	}
-	
 	
 	/*
 	 * Set a car's times based on the given clock.
