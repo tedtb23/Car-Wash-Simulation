@@ -15,5 +15,4 @@ For example, an input file could look like...
 5 2.00\
 5 35.00\
 5 0.25\
-
 This sample input is provided in sampleInput.txt in the project root directory.
