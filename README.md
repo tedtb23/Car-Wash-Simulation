@@ -1,5 +1,5 @@
 # Car-Wash-Simulation
-Simple simulation of a car wash with a flexible pricing structure that determines which car to wash next based on a car's chosen price.
+A car wash simulation with a flexible pricing structure that determines which car to wash next based on a car's chosen price and its arrival time.
 
 Format the input file as arrivalTime(int) price(float).
 For example, an input file could look like...
