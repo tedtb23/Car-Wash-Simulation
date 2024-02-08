@@ -4,7 +4,7 @@ A car wash simulation with a flexible pricing structure that determines which ca
 
 ## Execute this program
 
-- Open a terminal to the root Car Wash Simulation directory.
+- Open a terminal to the root Car-Wash-Simulation directory.
 
 ```console
 java -jar CW.jar
