@@ -12,7 +12,7 @@ java -jar CW.jar
 
 **Sample input is provided in sampleInput.txt in the project root directory.**
 
-- Format any input files you want to create as arrivalTime(int) price(float).
+- Format any input files you want to create as arrivalTime(int) price(double).
   For example, an input file could look like...\
   0 4.00\
   0 3.25\
