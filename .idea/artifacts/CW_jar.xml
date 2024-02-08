@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="CW:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CW_jar</output-path>
+    <root id="archive" name="CW.jar">
+      <element id="module-output" name="Car Wash Simulation" />
+    </root>
+  </artifact>
+</component>
